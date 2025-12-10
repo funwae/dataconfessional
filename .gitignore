@@ -1,0 +1,94 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+/test-results
+/playwright-report
+/playwright/.cache
+e2e-test-results.txt
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+desktop.ini
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# local env files
+.env*.local
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# prisma
+/prisma/migrations
+*.db
+*.db-journal
+
+# uploads and exports (user data)
+/uploads
+/exports
+
+# Tauri
+/src-tauri/target
+# Note: Cargo.lock is committed for reproducible builds
+
+# Rust
+**/*.rs.bk
+**/target/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Engine config and logs (user-specific)
+**/engine-config.json
+**/logs/
+**/engine/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup

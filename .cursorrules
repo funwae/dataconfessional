@@ -1,0 +1,51 @@
+# Cursor Rules for Data Nexus
+
+You are building a **production-quality full-stack web app** called **Data Nexus**.
+
+## General
+
+- **Follow the docs in `/docs` as the source of truth.**
+- Default to **TypeScript** for all application code.
+- Prefer **Next.js (App Router) + React + Tailwind CSS** for the frontend.
+- Use **Node + Next API routes** or **separate FastAPI/Express backend** (the docs will clarify).
+- Everything should be structured, typed, and easy to extend.
+
+## Style & UX
+
+- UI must feel:
+  - Calm, analytical, business-friendly
+  - Not "dev tool" cluttered, not "consumer app" goofy
+- Prioritize:
+  - Clear navigation between **Projects**, **Data**, **Dashboard**, **Reports**, **AI Q&A**
+  - Minimal clicks to generate a **first-pass dashboard + report**
+
+## AI Integration
+
+- Abstract LLM access via a single `llmClient` layer.
+- Never hardcode API keys; read from environment variables.
+- Implement **prompt builders** as reusable helpers, informed by `/docs/06-ai-agent-and-prompting.md`.
+
+## Data & Security
+
+- Respect the models in `/docs/09-data-model.md`.
+- Never log raw data or secrets in server logs.
+- Assume PII may be present; follow best practices in `/docs/10-security-and-permissions.md`.
+
+## What to Build First
+
+1. Minimal auth (email or simple stub for now if needed).
+2. Project list page + "Create Project" flow.
+3. Data ingestion for CSV/XLSX and simple URL fetch.
+4. Auto-profiling and suggested charts.
+5. Basic AI Q&A panel that:
+   - Reads project-scoped data summaries
+   - Returns answers with references
+
+## Don'ts
+
+- Don't invent new features beyond what the docs describe without clear comments.
+- Don't mix frontend and backend concerns in the same files.
+- Don't tightly couple the LLM provider; use an abstraction.
+
+When in doubt, **refer back to `/docs`**, keep things clean, and favor boring, maintainable solutions.
+

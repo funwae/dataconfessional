@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./data-confessional.db"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  password      String?        // For simple auth, null if using OAuth
+  createdAt     DateTime       @default(now())
+  projects      Project[]
+  savedTemplates SavedTemplate[]
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name         String
+  goalType     GoalType
+  audienceType AudienceType
+  tone         String @default("serious") // "serious" or "gossip" - default tone for project
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  dataSources  DataSource[]
+  charts       Chart[]
+  reports      Report[]
+  qaInteractions QAInteraction[]
+  exports      Export[]
+  keyAdmissions KeyAdmission[]
+}
+
+enum GoalType {
+  MARKET_SNAPSHOT
+  SALES_OVERVIEW
+  MARKETING_PERFORMANCE
+  GENERAL_ANALYSIS
+}
+
+enum AudienceType {
+  SELF
+  MANAGER_DIRECTOR
+  EXECUTIVE_EXTERNAL
+}
+
+model DataSource {
+  id            String          @id @default(cuid())
+  projectId     String
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type          DataSourceType
+  name          String
+  status        DataSourceStatus @default(PENDING)
+  rawPath       String?         // Path in object storage
+  meta          String? @default("{}") // Additional metadata (JSON string)
+  errorMessage  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  tables        Table[]
+  documentChunks DocumentChunk[]
+}
+
+enum DataSourceType {
+  CSV
+  XLSX
+  URL
+  TEXT
+}
+
+enum DataSourceStatus {
+  PENDING
+  PROCESSED
+  ERROR
+}
+
+model Table {
+  id            String         @id @default(cuid())
+  dataSourceId  String
+  dataSource    DataSource     @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+  name          String
+  rowCount      Int
+  columnCount   Int
+  createdAt     DateTime       @default(now())
+  columnProfiles ColumnProfile[]
+  charts        Chart[]
+}
+
+model ColumnProfile {
+  id            String   @id @default(cuid())
+  tableId       String
+  table         Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  name          String
+  dataType      String   // numeric, string, boolean, date, categorical
+  nullPercentage Float
+  distinctCount Int?
+  min           Float?
+  max           Float?
+  mean          Float?
+  stdDev        Float?
+  createdAt     DateTime @default(now())
+}
+
+model DocumentChunk {
+  id          String     @id @default(cuid())
+  dataSourceId String
+  dataSource  DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+  orderIndex  Int
+  text        String
+  embedding   String?    // JSON array of floats
+  createdAt   DateTime   @default(now())
+}
+
+model Chart {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tableId     String?
+  table       Table?   @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  title       String
+  chartType   String   // line, bar, stackedBar, pie, donut, funnel, table
+  config      String @default("{}") // Chart configuration (xField, yField, seriesField, etc.) - JSON string
+  insight     String?  // One-line insight text
+  isPinned    Boolean  @default(false)
+  generatedBy String  @default("system") // system or user
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Report {
+  id          String         @id @default(cuid())
+  projectId   String
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  templateType String        // market_snapshot, sales_overview, marketing_performance, general_analysis
+  title       String
+  tone        String @default("serious") // "serious" or "gossip"
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  sections    ReportSection[]
+}
+
+model ReportSection {
+  id          String   @id @default(cuid())
+  reportId    String
+  report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  key         String   // e.g., "executive_summary"
+  title       String
+  orderIndex  Int
+  content     String // Markdown content
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model QAInteraction {
+  id            String   @id @default(cuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  question      String
+  answer        String
+  supportingData String? @default("{}") // Which data sources/tables were used - JSON string
+  caveats       String @default("") // Array of caveats (comma-separated)
+  tone          String @default("serious") // "serious" or "gossip"
+  createdAt     DateTime @default(now())
+}
+
+model Export {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        ExportType
+  path        String   // Path in object storage
+  options     String? @default("{}") // Export options (includeCharts, includeAppendix, etc.) - JSON string
+  createdAt   DateTime @default(now())
+}
+
+enum ExportType {
+  SUMMARY
+  DECK
+  FULL
+  MARKDOWN
+  MEETING_BRIEF
+  SPEAKER_NOTES
+}
+
+model SavedTemplate {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  chartConfigs   String        @default("[]") // JSON array of chart configs
+  reportSections String       @default("[]") // JSON array of section definitions
+  defaultAudience AudienceType
+  defaultTone    String        @default("serious") // "serious" or "gossip"
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model KeyAdmission {
+  id            String   @id @default(cuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  text          String   // The admission statement
+  sourceType    String   // "chart", "qa", "report"
+  sourceId      String   // ID of chart/QA/report section
+  isTalkingPoint Boolean @default(false) // Marked for deck
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+}
+

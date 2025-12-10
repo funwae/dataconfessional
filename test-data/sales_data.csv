@@ -1,0 +1,14 @@
+Date,Region,Product,Revenue,Units_Sold,Customer_Type
+2024-01-15,West,Widget A,125000,500,Enterprise
+2024-01-20,East,Widget B,98000,350,Mid-Market
+2024-01-25,West,Widget A,145000,580,Enterprise
+2024-02-01,South,Widget C,75000,300,Small Business
+2024-02-10,West,Widget A,132000,528,Enterprise
+2024-02-15,East,Widget B,105000,375,Mid-Market
+2024-02-20,North,Widget A,118000,472,Enterprise
+2024-03-01,West,Widget B,92000,328,Mid-Market
+2024-03-10,South,Widget C,68000,272,Small Business
+2024-03-15,East,Widget A,155000,620,Enterprise
+2024-03-20,West,Widget A,142000,568,Enterprise
+2024-03-25,North,Widget B,88000,314,Mid-Market
+
