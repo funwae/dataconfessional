@@ -92,3 +92,5 @@ Thumbs.db
 *.temp
 *.bak
 *.backup
+.dev-server.pid
+*.pid
